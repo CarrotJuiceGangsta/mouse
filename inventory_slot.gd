@@ -1,42 +1,29 @@
-extends Node2D
+extends Marker2D
 
-var selected = false
-var rest_point = Vector2()
-var rest_nodes = []
-var items = ["hello", "abab"]
+
+@export var full = false
 @export var item = ""
-func _ready():
-	rest_nodes = get_tree().get_nodes_in_group("zone")
-	print(item)
-	for child in rest_nodes:
-		if child.full == false:
-			rest_point = child.global_position
-			child.select()
-			break
+var shortest_dist = 75
+
+func _draw():
+	draw_circle(Vector2.ZERO, 75, Color.TRANSPARENT)
+	modulate.a = 0.05
 	
-func _physics_process(delta):
-	if selected:
-		global_position = lerp(global_position, get_global_mouse_position(), 25 * delta)
-#		look_at(get_global_mouse_position())
-	else:
-		global_position = lerp(global_position, rest_point, 10 * delta)
-#		rotation = lerp_angle(rotation, 0, 10 * delta)
-		
+func select():
+	for child in get_tree().get_nodes_in_group("zone"):
+		if child.full:
+			pass
+		else:
+			child.deselect()
+	modulate = Color.WEB_MAROON
+	modulate.a = 0.05
+	full = true
+
+	
+func deselect():
+	modulate = Color.WHITE
+	modulate.a = 0.05
+	full = false
 
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-			selected = false
-			var shortest_dist = 75
-			for child in rest_nodes:
-				var distance = global_position.distance_to(child.global_position)
-				if distance < shortest_dist == true and child.full == false:
-					child.select()
-					rest_point = child.global_position
-					shortest_dist = distance
 
-
-func _on_area_2d_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
-	if Input.is_action_just_pressed("interact"):
-		selected = true
